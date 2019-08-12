@@ -10,4 +10,7 @@ public interface Machine {
 	
 	public Parameters getParameters();
 	
+	public String setDescription (String description);
+	
+	public String getDescription();
 }
