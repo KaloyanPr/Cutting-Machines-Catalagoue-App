@@ -1,1 +1,3 @@
-# Cutting-Machines-Catalagoue-App
+# Cutting Machines Catalogue Application
+
+# In process of making
