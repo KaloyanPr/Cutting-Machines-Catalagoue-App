@@ -14,16 +14,17 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 public class CuttingMachineCatalogue extends JFrame{
-	private JButton jcomp1;
+	private JButton searchButton;
+	@SuppressWarnings("rawtypes")
 	private JComboBox operationsBox;
-	private JLabel jcomp3;
+	private JLabel chooseProcessLabel;
 	private JTextField jcomp4;
 	private JTextArea jcomp5;
 	private JTextField jcomp6;
 	private JTextField jcomp7;
 	private JLabel jcomp8;
 	private JLabel jcomp9;
-	private JMenuBar jcomp10;
+	private JMenuBar menuBarItem;
 	private JTextArea jcomp11;
 	private JLabel jcomp12;
 	private JTextArea jcomp13;
@@ -61,18 +62,18 @@ public class CuttingMachineCatalogue extends JFrame{
 		JMenuItem aboutItem = new JMenuItem("About");
 		helpMenu.add(aboutItem);
 
-		jcomp1 = new JButton("Търси");
+		searchButton = new JButton("Търси");
 		operationsBox = new JComboBox(operations);
-		jcomp3 = new JLabel("Избор на процес");
+		chooseProcessLabel = new JLabel("Избор на процес");
 		jcomp4 = new JTextField(5);
 		jcomp5 = new JTextArea(5, 5);
 		jcomp6 = new JTextField(5);
 		jcomp7 = new JTextField(5);
 		jcomp8 = new JLabel("Параметри");
 		jcomp9 = new JLabel("Текстова информация за машината");
-		jcomp10 = new JMenuBar();
-		jcomp10.add(fileMenu);
-		jcomp10.add(helpMenu);
+		menuBarItem = new JMenuBar();
+		menuBarItem.add(fileMenu);
+		menuBarItem.add(helpMenu);
 		jcomp11 = new JTextArea(5, 5);
 		jcomp12 = new JLabel("Чертеж на машината");
 		jcomp13 = new JTextArea(5, 5);
@@ -82,32 +83,32 @@ public class CuttingMachineCatalogue extends JFrame{
 		setPreferredSize(new Dimension(667, 366));
 		setLayout(null);
 
-		add(jcomp1);
+		add(searchButton);
 		add(operationsBox);
-		add(jcomp3);
+		add(chooseProcessLabel);
 		add(jcomp4);
 		add(jcomp5);
 		add(jcomp6);
 		add(jcomp7);
 		add(jcomp8);
 		add(jcomp9);
-		add(jcomp10);
+		add(menuBarItem);
 		add(jcomp11);
 		add(jcomp12);
 		add(jcomp13);
 		add(jcomp14);
 		add(jcomp15);
 
-		jcomp1.setBounds(5, 225, 140, 20);
+		searchButton.setBounds(5, 225, 140, 20);
 		operationsBox.setBounds(10, 50, 140, 30);
-		jcomp3.setBounds(30, 25, 100, 25);
+		chooseProcessLabel.setBounds(30, 25, 100, 25);
 		jcomp4.setBounds(5, 110, 100, 25);
 		jcomp5.setBounds(365, 300, 315, 190);
 		jcomp6.setBounds(5, 140, 100, 25);
 		jcomp7.setBounds(5, 180, 100, 25);
 		jcomp8.setBounds(5, 85, 100, 25);
 		jcomp9.setBounds(370, 260, 220, 30);
-		jcomp10.setBounds(0, 0, 200, 25);
+		menuBarItem.setBounds(0, 0, 200, 25);
 		jcomp11.setBounds(30, 305, 285, 180);
 		jcomp12.setBounds(40, 265, 235, 25);
 		jcomp13.setBounds(365, 65, 315, 170);

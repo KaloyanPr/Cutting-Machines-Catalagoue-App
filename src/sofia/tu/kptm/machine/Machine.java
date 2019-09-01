@@ -6,9 +6,9 @@ public interface Machine {
 	
 	public String getName();
 	
-	public Parameters setParameters (Parameters parameters);
+	public LatheParameters setParameters (LatheParameters latheParameters);
 	
-	public Parameters getParameters();
+	public LatheParameters getParameters();
 	
 	public String setDescription (String description);
 	
