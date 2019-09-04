@@ -1,5 +1,13 @@
 package sofia.tu.kptm.main;
 
+import static sofia.tu.kptm.main.Operations.CUTTING;
+import static sofia.tu.kptm.main.Operations.DRILLING;
+import static sofia.tu.kptm.main.Operations.TURNING;
+import static sofia.tu.kptm.main.Operations.MILLING;
+import static sofia.tu.kptm.main.Operations.GRINDING;
+import static sofia.tu.kptm.main.Operations.GEAR_GRINDING;
+import static sofia.tu.kptm.main.Operations.SHREDDING;
+
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
@@ -15,9 +23,14 @@ import javax.swing.JMenuItem;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import sofia.tu.kptm.impl.TurningImpl;
 import sofia.tu.kptm.machine.LatheParameters;
 
 public class CuttingMachineCatalogue extends JFrame implements ActionListener {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1925207399835543294L;
 	private JButton searchButton;
 	@SuppressWarnings("rawtypes")
 	private JComboBox operationsBox;
@@ -37,29 +50,25 @@ public class CuttingMachineCatalogue extends JFrame implements ActionListener {
 	private JLabel parameter1;
 	private JLabel parameter2;
 	private JLabel parameter3;
+	
+	private String operation;
 
 	/**
 	 * Author: Kaloyan Proynov
 	 */
 	private LatheParameters latheParameters;
-	private static final long serialVersionUID = -6856265190838119905L;
 
 	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				new CuttingMachineCatalogue().setVisible(true);
-			}
-		});
+		EventQueue.invokeLater(() -> new CuttingMachineCatalogue().setVisible(true));
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public CuttingMachineCatalogue() {
 		super("Cutting machines");
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setSize(800, 600);
 
-		String[] operations = { "Turning", "Drilling", "Milling", "Grinding ", "Shredding", "Gear Grinding",
-				"Cutting" };
+		String[] operations = { TURNING, DRILLING, MILLING, GRINDING, GEAR_GRINDING, SHREDDING, CUTTING };
 		JMenu fileMenu = new JMenu("File");
 		JMenuItem printItem = new JMenuItem("Print");
 		fileMenu.add(printItem);
@@ -141,21 +150,37 @@ public class CuttingMachineCatalogue extends JFrame implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		try {
 			Object source = e.getSource();
-			if (operationsBox.getSelectedItem().equals("Turning")) {
-				latheParameters.setMaxProcessedDiameter(Integer.parseInt(paramInput1.getText()));
-			}else if (operationsBox.getSelectedItem().equals("Drilling")) {
+			if (operationsBox.getSelectedItem().equals(TURNING)) {
+				parameter1.setText("Максимален обработван диаметър");
+				operation = TURNING;
+			}else if (operationsBox.getSelectedItem().equals(DRILLING)) {
 				parameter1.setText("Диаметър на свредло");
 				parameter2.setText("Брой подавания");
+				operation = DRILLING;
 			}else if (operationsBox.getSelectedItem().equals("Milling")) {
-				
+				parameter1.setText("Диаметър");
+				operation = MILLING;
 			}else if (operationsBox.getSelectedItem().equals("Grinding")) {
-				
+				operation = GRINDING;
 			}else if (operationsBox.getSelectedItem().equals("Shredding")) {
-				
+				operation = SHREDDING;
 			}else if (operationsBox.getSelectedItem().equals("Gear Grinding")) {
-				
+				operation = GEAR_GRINDING;
 			}else if (operationsBox.getSelectedItem().equals("Cutting")) {
-				
+				operation = CUTTING;
+			}
+			if (source == searchButton) {
+				switch (operation) {
+				case TURNING:
+					TurningImpl.handleTurningMachineRequest(latheParameters);
+					TurningImpl turningImpl = new TurningImpl();
+					latheParameters = turningImpl.getLatheParameters(Integer.parseInt(paramInput1.getText()), Integer.parseInt(paramInput2.getText()), Integer.parseInt(paramInput3.getText()));
+					break;
+				case DRILLING:
+					break;
+					default:
+						break;
+				}
 			}
 
 		} catch (Exception ex) {

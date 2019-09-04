@@ -3,11 +3,9 @@ package sofia.tu.kptm.machine;
 public class LatheParameters {
 	private int maxProcessedWidth;
 	private int maxProcessedDiameter;
-	private int enginePower;
 	private int maxTransverseDisplacement;
 	
-	public LatheParameters(int maxProcessedWidth, int maxProcessedDimeter, int enginePower, int maxTransverseDisplacement) {
-		this.enginePower = enginePower;
+	public LatheParameters(int maxProcessedWidth, int maxProcessedDimeter,int maxTransverseDisplacement) {
 		this.maxProcessedDiameter = maxProcessedDimeter;
 		this.maxProcessedWidth = maxProcessedWidth;
 		this.maxTransverseDisplacement = maxTransverseDisplacement;
@@ -27,14 +25,6 @@ public class LatheParameters {
 
 	public void setMaxProcessedDiameter(int maxProcessedDiameter) {
 		this.maxProcessedDiameter = maxProcessedDiameter;
-	}
-
-	public int getEnginePower() {
-		return enginePower;
-	}
-
-	public void setEnginePower(int enginePower) {
-		this.enginePower = enginePower;
 	}
 
 	public int getMaxTransverseDisplacement() {
