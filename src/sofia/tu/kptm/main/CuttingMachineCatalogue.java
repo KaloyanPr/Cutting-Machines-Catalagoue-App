@@ -35,6 +35,9 @@ public class CuttingMachineCatalogue extends JFrame implements ActionListener {
 	private JLabel jcomp14;
 	private JButton jcomp15;
 	private JLabel parameter1;
+	private JLabel parameter2;
+	private JLabel parameter3;
+
 	/**
 	 * Author: Kaloyan Proynov
 	 */
@@ -86,6 +89,8 @@ public class CuttingMachineCatalogue extends JFrame implements ActionListener {
 		jcomp14 = new JLabel("Кинематична схема на машината");
 		jcomp15 = new JButton("Още информация и схеми ");
 		parameter1 = new JLabel("Максимален обработван диаметър");
+		parameter2 = new JLabel("Максимален обработван диаметър");
+		parameter3 = new JLabel("todo");
 
 		setPreferredSize(new Dimension(667, 366));
 		setLayout(null);
@@ -106,7 +111,9 @@ public class CuttingMachineCatalogue extends JFrame implements ActionListener {
 		add(jcomp14);
 		add(jcomp15);
 		add(parameter1);
-
+		add(parameter2);
+		add(parameter3);
+		
 		searchButton.setBounds(5, 225, 140, 20);
 		searchButton.addActionListener(this);
 		operationsBox.setBounds(10, 50, 140, 30);
@@ -125,6 +132,8 @@ public class CuttingMachineCatalogue extends JFrame implements ActionListener {
 		jcomp14.setBounds(370, 20, 250, 35);
 		jcomp15.setBounds(350, 500, 280, 40);
 		parameter1.setBounds(115, 110, 210, 25);
+		parameter2.setBounds(120, 115, 210, 25);
+		parameter3.setBounds(120, 115, 210, 25);
 
 	}
 
@@ -134,8 +143,19 @@ public class CuttingMachineCatalogue extends JFrame implements ActionListener {
 			Object source = e.getSource();
 			if (operationsBox.getSelectedItem().equals("Turning")) {
 				latheParameters.setMaxProcessedDiameter(Integer.parseInt(paramInput1.getText()));
-			} else if (operationsBox.getSelectedItem().equals("Drilling")) {
-				parameter1.setText("zz");
+			}else if (operationsBox.getSelectedItem().equals("Drilling")) {
+				parameter1.setText("Диаметър на свредло");
+				parameter2.setText("Брой подавания");
+			}else if (operationsBox.getSelectedItem().equals("Milling")) {
+				
+			}else if (operationsBox.getSelectedItem().equals("Grinding")) {
+				
+			}else if (operationsBox.getSelectedItem().equals("Shredding")) {
+				
+			}else if (operationsBox.getSelectedItem().equals("Gear Grinding")) {
+				
+			}else if (operationsBox.getSelectedItem().equals("Cutting")) {
+				
 			}
 
 		} catch (Exception ex) {
