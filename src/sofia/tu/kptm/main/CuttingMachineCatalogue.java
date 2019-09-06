@@ -8,6 +8,7 @@ import static sofia.tu.kptm.main.Operations.GRINDING;
 import static sofia.tu.kptm.main.Operations.GEAR_GRINDING;
 import static sofia.tu.kptm.main.Operations.SHREDDING;
 
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
@@ -50,11 +51,12 @@ public class CuttingMachineCatalogue extends JFrame implements ActionListener {
 	private JLabel parameter1;
 	private JLabel parameter2;
 	private JLabel parameter3;
-	
+
 	private String operation;
+	private Container container;
 
 	/**
-	 * Author: Kaloyan Proynov
+	 * @author Kaloyan Proynov
 	 */
 	private LatheParameters latheParameters;
 
@@ -67,6 +69,7 @@ public class CuttingMachineCatalogue extends JFrame implements ActionListener {
 		super("Cutting machines");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setSize(800, 600);
+		container = this.getContentPane();
 
 		String[] operations = { TURNING, DRILLING, MILLING, GRINDING, GEAR_GRINDING, SHREDDING, CUTTING };
 		JMenu fileMenu = new JMenu("File");
@@ -98,7 +101,7 @@ public class CuttingMachineCatalogue extends JFrame implements ActionListener {
 		jcomp14 = new JLabel("Кинематична схема на машината");
 		jcomp15 = new JButton("Още информация и схеми ");
 		parameter1 = new JLabel("Максимален обработван диаметър");
-		parameter2 = new JLabel("Максимален обработван диаметър");
+		parameter2 = new JLabel("Ширина");
 		parameter3 = new JLabel("todo");
 
 		setPreferredSize(new Dimension(667, 366));
@@ -122,7 +125,7 @@ public class CuttingMachineCatalogue extends JFrame implements ActionListener {
 		add(parameter1);
 		add(parameter2);
 		add(parameter3);
-		
+
 		searchButton.setBounds(5, 225, 140, 20);
 		searchButton.addActionListener(this);
 		operationsBox.setBounds(10, 50, 140, 30);
@@ -153,33 +156,34 @@ public class CuttingMachineCatalogue extends JFrame implements ActionListener {
 			if (operationsBox.getSelectedItem().equals(TURNING)) {
 				parameter1.setText("Максимален обработван диаметър");
 				operation = TURNING;
-			}else if (operationsBox.getSelectedItem().equals(DRILLING)) {
+			} else if (operationsBox.getSelectedItem().equals(DRILLING)) {
 				parameter1.setText("Диаметър на свредло");
 				parameter2.setText("Брой подавания");
 				operation = DRILLING;
-			}else if (operationsBox.getSelectedItem().equals("Milling")) {
+			} else if (operationsBox.getSelectedItem().equals(MILLING)) {
 				parameter1.setText("Диаметър");
 				operation = MILLING;
-			}else if (operationsBox.getSelectedItem().equals("Grinding")) {
+			} else if (operationsBox.getSelectedItem().equals(GRINDING)) {
 				operation = GRINDING;
-			}else if (operationsBox.getSelectedItem().equals("Shredding")) {
+			} else if (operationsBox.getSelectedItem().equals(SHREDDING)) {
 				operation = SHREDDING;
-			}else if (operationsBox.getSelectedItem().equals("Gear Grinding")) {
+			} else if (operationsBox.getSelectedItem().equals(GEAR_GRINDING)) {
 				operation = GEAR_GRINDING;
-			}else if (operationsBox.getSelectedItem().equals("Cutting")) {
+			} else if (operationsBox.getSelectedItem().equals(CUTTING)) {
 				operation = CUTTING;
 			}
 			if (source == searchButton) {
 				switch (operation) {
 				case TURNING:
-					TurningImpl.handleTurningMachineRequest(latheParameters);
 					TurningImpl turningImpl = new TurningImpl();
-					latheParameters = turningImpl.getLatheParameters(Integer.parseInt(paramInput1.getText()), Integer.parseInt(paramInput2.getText()), Integer.parseInt(paramInput3.getText()));
+					latheParameters = turningImpl.getLatheParameters(Integer.parseInt(paramInput1.getText()),
+							Integer.parseInt(paramInput2.getText()), Integer.parseInt(paramInput3.getText()));
+					TurningImpl.handleTurningMachineRequest(latheParameters);
 					break;
 				case DRILLING:
 					break;
-					default:
-						break;
+				default:
+					break;
 				}
 			}
 
