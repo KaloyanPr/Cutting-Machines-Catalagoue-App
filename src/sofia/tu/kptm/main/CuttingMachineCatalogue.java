@@ -184,10 +184,10 @@ public class CuttingMachineCatalogue extends JFrame implements ActionListener {
 				operation = MILLING;
 			} else if (operationsBox.getSelectedItem().equals(GRINDING)) {
 				operation = GRINDING;
-			} else if (operationsBox.getSelectedItem().equals(SHREDDING)) {
-				operation = SHREDDING;
-			} else if (operationsBox.getSelectedItem().equals(GEAR_GRINDING)) {
-				operation = GEAR_GRINDING;
+			} else if (operationsBox.getSelectedItem().equals(SCRAPING)) {
+				operation = SCRAPING;
+			} else if (operationsBox.getSelectedItem().equals(GEAR_PROCESSING)) {
+				operation = GEAR_PROCESSING;
 			} else if (operationsBox.getSelectedItem().equals(CUTTING)) {
 				operation = CUTTING;
 			}
