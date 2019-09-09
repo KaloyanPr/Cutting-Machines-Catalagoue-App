@@ -55,7 +55,7 @@ public class CuttingMachineCatalogue extends JFrame implements ActionListener {
 	private JLabel parameter1;
 	private JLabel parameter2;
 	private JLabel parameter3;
-	
+
 	private String operation;
 
 	/**
@@ -65,27 +65,23 @@ public class CuttingMachineCatalogue extends JFrame implements ActionListener {
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(() -> {
-			try {
-				new CuttingMachineCatalogue().setVisible(true);
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			new CuttingMachineCatalogue().setVisible(true);
 		});
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public CuttingMachineCatalogue() throws ClassNotFoundException {
+	public CuttingMachineCatalogue() {
 		super("Cutting machines");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setSize(800, 600);
-		try(Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/catalogue?useSSL=false","root","123456")){
-			
-			Statement stmt=connection.createStatement();  
-			ResultSet rs=stmt.executeQuery("select * from lathes");  
-			while(rs.next())  
-			System.out.println(rs.getInt(1)+"  "+rs.getString(2)+"  "+rs.getInt(3));  
-		}catch(Exception ex) {
+		try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/catalogue?useSSL=false",
+				"root", "123456")) {
+
+			Statement stmt = connection.createStatement();
+			ResultSet rs = stmt.executeQuery("select * from lathes");
+			while (rs.next())
+				System.out.println(rs.getInt(1) + "  " + rs.getString(2) + "  " + rs.getInt(3));
+		} catch (Exception ex) {
 			System.out.println(ex);
 			System.out.println(ex.getMessage());
 		}
@@ -144,7 +140,7 @@ public class CuttingMachineCatalogue extends JFrame implements ActionListener {
 		add(parameter1);
 		add(parameter2);
 		add(parameter3);
-		
+
 		searchButton.setBounds(5, 225, 140, 20);
 		searchButton.addActionListener(this);
 		operationsBox.setBounds(10, 50, 140, 30);
@@ -175,20 +171,20 @@ public class CuttingMachineCatalogue extends JFrame implements ActionListener {
 			if (operationsBox.getSelectedItem().equals(TURNING)) {
 				parameter1.setText("Максимален обработван диаметър");
 				operation = TURNING;
-			}else if (operationsBox.getSelectedItem().equals(DRILLING)) {
+			} else if (operationsBox.getSelectedItem().equals(DRILLING)) {
 				parameter1.setText("Диаметър на свредло");
 				parameter2.setText("Брой подавания");
 				operation = DRILLING;
-			}else if (operationsBox.getSelectedItem().equals("Milling")) {
+			} else if (operationsBox.getSelectedItem().equals("Milling")) {
 				parameter1.setText("Диаметър");
 				operation = MILLING;
-			}else if (operationsBox.getSelectedItem().equals("Grinding")) {
+			} else if (operationsBox.getSelectedItem().equals("Grinding")) {
 				operation = GRINDING;
-			}else if (operationsBox.getSelectedItem().equals("Shredding")) {
+			} else if (operationsBox.getSelectedItem().equals("Shredding")) {
 				operation = SCRAPING;
-			}else if (operationsBox.getSelectedItem().equals("Gear Grinding")) {
+			} else if (operationsBox.getSelectedItem().equals("Gear Grinding")) {
 				operation = GEAR_PROCESSING;
-			}else if (operationsBox.getSelectedItem().equals("Cutting")) {
+			} else if (operationsBox.getSelectedItem().equals("Cutting")) {
 				operation = CUTTING;
 			}
 			if (source == searchButton) {
@@ -196,12 +192,13 @@ public class CuttingMachineCatalogue extends JFrame implements ActionListener {
 				case TURNING:
 					TurningImpl.handleTurningMachineRequest(latheParameters);
 					TurningImpl turningImpl = new TurningImpl();
-					latheParameters = turningImpl.getLatheParameters(Integer.parseInt(paramInput1.getText()), Integer.parseInt(paramInput2.getText()), Integer.parseInt(paramInput3.getText()));
+					latheParameters = turningImpl.getLatheParameters(Integer.parseInt(paramInput1.getText()),
+							Integer.parseInt(paramInput2.getText()), Integer.parseInt(paramInput3.getText()));
 					break;
 				case DRILLING:
 					break;
-					default:
-						break;
+				default:
+					break;
 				}
 			}
 
