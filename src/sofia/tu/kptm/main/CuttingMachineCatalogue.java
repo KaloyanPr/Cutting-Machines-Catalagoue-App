@@ -5,13 +5,18 @@ import static sofia.tu.kptm.main.Operations.DRILLING;
 import static sofia.tu.kptm.main.Operations.TURNING;
 import static sofia.tu.kptm.main.Operations.MILLING;
 import static sofia.tu.kptm.main.Operations.GRINDING;
-import static sofia.tu.kptm.main.Operations.GEAR_GRINDING;
-import static sofia.tu.kptm.main.Operations.SHREDDING;
+import static sofia.tu.kptm.main.Operations.GEAR_PROCESSING;
+import static sofia.tu.kptm.main.Operations.SCRAPING;
 
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -59,16 +64,33 @@ public class CuttingMachineCatalogue extends JFrame implements ActionListener {
 	private LatheParameters latheParameters;
 
 	public static void main(String[] args) {
-		EventQueue.invokeLater(() -> new CuttingMachineCatalogue().setVisible(true));
+		EventQueue.invokeLater(() -> {
+			try {
+				new CuttingMachineCatalogue().setVisible(true);
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		});
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public CuttingMachineCatalogue() {
+	public CuttingMachineCatalogue() throws ClassNotFoundException {
 		super("Cutting machines");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setSize(800, 600);
+		try(Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/catalogue?useSSL=false","root","123456")){
+			
+			Statement stmt=connection.createStatement();  
+			ResultSet rs=stmt.executeQuery("select * from lathes");  
+			while(rs.next())  
+			System.out.println(rs.getInt(1)+"  "+rs.getString(2)+"  "+rs.getInt(3));  
+		}catch(Exception ex) {
+			System.out.println(ex);
+			System.out.println(ex.getMessage());
+		}
 
-		String[] operations = { TURNING, DRILLING, MILLING, GRINDING, GEAR_GRINDING, SHREDDING, CUTTING };
+		String[] operations = { TURNING, DRILLING, MILLING, GRINDING, GEAR_PROCESSING, SCRAPING, CUTTING };
 		JMenu fileMenu = new JMenu("File");
 		JMenuItem printItem = new JMenuItem("Print");
 		fileMenu.add(printItem);
@@ -163,9 +185,9 @@ public class CuttingMachineCatalogue extends JFrame implements ActionListener {
 			}else if (operationsBox.getSelectedItem().equals("Grinding")) {
 				operation = GRINDING;
 			}else if (operationsBox.getSelectedItem().equals("Shredding")) {
-				operation = SHREDDING;
+				operation = SCRAPING;
 			}else if (operationsBox.getSelectedItem().equals("Gear Grinding")) {
-				operation = GEAR_GRINDING;
+				operation = GEAR_PROCESSING;
 			}else if (operationsBox.getSelectedItem().equals("Cutting")) {
 				operation = CUTTING;
 			}
