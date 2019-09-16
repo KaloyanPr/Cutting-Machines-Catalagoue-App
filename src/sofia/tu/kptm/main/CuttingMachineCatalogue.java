@@ -13,14 +13,25 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -76,18 +87,7 @@ public class CuttingMachineCatalogue extends JFrame implements ActionListener {
 		super("Cutting machines");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setSize(800, 600);
-		try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/catalogue?useSSL=false",
-				"root", "123456")) {
 		container = this.getContentPane();
-
-			Statement stmt = connection.createStatement();
-			ResultSet rs = stmt.executeQuery("select * from lathes");
-			while (rs.next())
-				System.out.println(rs.getInt(1) + "  " + rs.getString(2) + "  " + rs.getInt(3));
-		} catch (Exception ex) {
-			System.out.println(ex);
-			System.out.println(ex.getMessage());
-		}
 
 		String[] operations = { TURNING, DRILLING, MILLING, GRINDING, GEAR_PROCESSING, SCRAPING, CUTTING };
 		JMenu fileMenu = new JMenu("File");
@@ -129,15 +129,15 @@ public class CuttingMachineCatalogue extends JFrame implements ActionListener {
 		add(operationsBox);
 		add(chooseProcessLabel);
 		add(paramInput1);
-		add(jcomp5);
+		//add(jcomp5);
 		add(paramInput2);
 		add(paramInput3);
 		add(jcomp8);
 		add(jcomp9);
 		add(menuBarItem);
-		add(jcomp11);
+	//	add(jcomp11);
 		add(jcomp12);
-		add(jcomp13);
+		//add(jcomp13);
 		add(jcomp14);
 		add(jcomp15);
 		add(parameter1);
@@ -164,7 +164,24 @@ public class CuttingMachineCatalogue extends JFrame implements ActionListener {
 		parameter1.setBounds(115, 110, 210, 25);
 		parameter2.setBounds(120, 115, 210, 25);
 		parameter3.setBounds(120, 115, 210, 25);
+		
+		connectToSqlDb();
 
+
+	}
+
+	private void connectToSqlDb() {
+		try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/catalogue?useSSL=false",
+				"root", "123456")) {
+
+			Statement stmt = connection.createStatement();
+			int n = 1250;
+			ResultSet rs = stmt.executeQuery(String.format("SELECT lathe_info FROM lathes WHERE maxProcessedDiameter = %d", n));
+			parseImageFromDB(rs);
+		} catch (Exception ex) {
+			System.out.println(ex);
+			System.out.println(ex.getMessage());
+		}
 	}
 
 	@Override
@@ -212,4 +229,19 @@ public class CuttingMachineCatalogue extends JFrame implements ActionListener {
 
 	}
 
+	private void parseImageFromDB(ResultSet rs) throws IOException, SQLException {
+		byte barr[] = null;
+		while (rs.next()) {
+			Blob b = rs.getBlob(1);
+			barr = b.getBytes(1, (int) b.length());
+			//FileOutputStream fout = new FileOutputStream("./sample/sample.jpg");
+			
+		}
+		File tmpFile = new File("tmpImage");
+		OutputStream targetFile= new FileOutputStream(tmpFile);
+		targetFile.write(barr);
+		String ss=tmpFile.getAbsolutePath();
+		jcomp9.setIcon(new ImageIcon(ss));
+		targetFile.close();
+	}
 }

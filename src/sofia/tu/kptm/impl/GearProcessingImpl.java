@@ -1,5 +1,5 @@
 package sofia.tu.kptm.impl;
 
-public class GearGrindingImpl {
+public class GearProcessingImpl {
 
 }
