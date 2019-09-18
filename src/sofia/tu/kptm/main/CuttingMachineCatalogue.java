@@ -8,11 +8,17 @@ import static sofia.tu.kptm.main.Operations.GRINDING;
 import static sofia.tu.kptm.main.Operations.GEAR_PROCESSING;
 import static sofia.tu.kptm.main.Operations.SCRAPING;
 
+import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.awt.Image;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -28,6 +34,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import javax.imageio.ImageIO;
+import javax.swing.BoxLayout;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -37,8 +45,11 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
 import sofia.tu.kptm.impl.TurningImpl;
 import sofia.tu.kptm.machine.LatheParameters;
@@ -53,21 +64,25 @@ public class CuttingMachineCatalogue extends JFrame implements ActionListener {
 	private JComboBox operationsBox;
 	private JLabel chooseProcessLabel;
 	private JTextField paramInput1;
-	private JTextArea jcomp5;
 	private JTextField paramInput2;
-	private JTextField paramInput3;
 	private JLabel jcomp8;
 	private JLabel jcomp9;
 	private JMenuBar menuBarItem;
-	private JTextArea jcomp11;
-	private JLabel jcomp12;
-	private JTextArea jcomp13;
-	private JLabel jcomp14;
+	private JLabel draftLabel;
+	private JLabel kinematicsLabel;
+	private JLabel draftImageLabel;
+	private JLabel kinematicsImageLabel;
 	private JButton jcomp15;
 	private JLabel parameter1;
 	private JLabel parameter2;
-	private JLabel parameter3;
-
+	private JPanel jpanel1;
+	private JPanel boxPanel;
+	private JPanel p2;
+	private JPanel p3;
+	private JPanel p4;
+	private JScrollPane scroll;
+	private JFrame frame;
+	
 	private String operation;
 	private Container container;
 
@@ -78,92 +93,91 @@ public class CuttingMachineCatalogue extends JFrame implements ActionListener {
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(() -> {
-			new CuttingMachineCatalogue().setVisible(true);
+			CuttingMachineCatalogue window = new CuttingMachineCatalogue();
+			window.frame.setVisible(true);
 		});
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public CuttingMachineCatalogue() {
-		super("Cutting machines");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setSize(800, 600);
-		container = this.getContentPane();
-
-		String[] operations = { TURNING, DRILLING, MILLING, GRINDING, GEAR_PROCESSING, SCRAPING, CUTTING };
-		JMenu fileMenu = new JMenu("File");
-		JMenuItem printItem = new JMenuItem("Print");
-		fileMenu.add(printItem);
-		JMenuItem exitItem = new JMenuItem("Exit");
-		fileMenu.add(exitItem);
-		JMenu helpMenu = new JMenu("Help");
-		JMenuItem contentsItem = new JMenuItem("Contents");
-		helpMenu.add(contentsItem);
-		JMenuItem aboutItem = new JMenuItem("About");
-		helpMenu.add(aboutItem);
-
-		searchButton = new JButton("Търси");
-		operationsBox = new JComboBox(operations);
-		chooseProcessLabel = new JLabel("Избор на процес");
-		paramInput1 = new JTextField(5);
-		jcomp5 = new JTextArea(5, 5);
-		paramInput2 = new JTextField(5);
-		paramInput3 = new JTextField(5);
-		jcomp8 = new JLabel("Параметри");
-		jcomp9 = new JLabel("Текстова информация за машината");
-		menuBarItem = new JMenuBar();
-		menuBarItem.add(fileMenu);
-		menuBarItem.add(helpMenu);
-		jcomp11 = new JTextArea(5, 5);
-		jcomp12 = new JLabel("Чертеж на машината");
-		jcomp13 = new JTextArea(5, 5);
-		jcomp14 = new JLabel("Кинематична схема на машината");
-		jcomp15 = new JButton("Още информация и схеми ");
-		parameter1 = new JLabel("Максимален обработван диаметър");
-		parameter2 = new JLabel("Ширина");
-		parameter3 = new JLabel("todo");
-
-		setPreferredSize(new Dimension(667, 366));
-		setLayout(null);
-
-		add(searchButton);
-		add(operationsBox);
-		add(chooseProcessLabel);
-		add(paramInput1);
-		//add(jcomp5);
-		add(paramInput2);
-		add(paramInput3);
-		add(jcomp8);
-		add(jcomp9);
-		add(menuBarItem);
-	//	add(jcomp11);
-		add(jcomp12);
-		//add(jcomp13);
-		add(jcomp14);
-		add(jcomp15);
-		add(parameter1);
-		add(parameter2);
-		add(parameter3);
-
-		searchButton.setBounds(5, 225, 140, 20);
-		searchButton.addActionListener(this);
-		operationsBox.setBounds(10, 50, 140, 30);
+		frame = new JFrame();
+		frame.setTitle("Cutting Machines Catalogue");
+		frame.setBounds(100, 100, 1158, 500);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		JPanel panel = new JPanel();
+		frame.getContentPane().add(panel, BorderLayout.NORTH);
+		
+		JLabel chooseProcessLabel = new JLabel("Избор");
+		panel.add(chooseProcessLabel);
+		
+		JPanel panel_1 = new JPanel();
+		panel.add(panel_1);
+		panel_1.setLayout(new BoxLayout(panel_1, BoxLayout.X_AXIS));
+		
+		JPanel panel_2 = new JPanel();
+		panel_1.add(panel_2);
+		panel_2.setLayout(new GridLayout(0, 2, 0, 0));
+		
+		operationsBox = new JComboBox();
+		operationsBox.setModel(new DefaultComboBoxModel(new String[] {TURNING,MILLING,DRILLING,SCRAPING,GRINDING,GEAR_PROCESSING,CUTTING}));
 		operationsBox.addActionListener(this);
-		chooseProcessLabel.setBounds(30, 25, 100, 25);
-		paramInput1.setBounds(5, 110, 100, 25);
-		jcomp5.setBounds(365, 300, 315, 190);
-		paramInput2.setBounds(5, 140, 100, 25);
-		paramInput3.setBounds(5, 180, 100, 25);
-		jcomp8.setBounds(5, 85, 100, 25);
-		jcomp9.setBounds(370, 260, 220, 30);
-		menuBarItem.setBounds(0, 0, 200, 25);
-		jcomp11.setBounds(30, 305, 285, 180);
-		jcomp12.setBounds(40, 265, 235, 25);
-		jcomp13.setBounds(365, 65, 315, 170);
-		jcomp14.setBounds(370, 20, 250, 35);
-		jcomp15.setBounds(350, 500, 280, 40);
-		parameter1.setBounds(115, 110, 210, 25);
-		parameter2.setBounds(120, 115, 210, 25);
-		parameter3.setBounds(120, 115, 210, 25);
+		panel_2.add(operationsBox);
+		
+		parameter1 = new JLabel("Диаметър");
+		panel_1.add(parameter1);
+		
+		paramInput1 = new JTextField();
+		paramInput1.setText("");
+		panel_1.add(paramInput1);
+		paramInput1.setColumns(10);
+		
+		parameter2 = new JLabel("Параметър");
+		panel.add(parameter2);
+		
+		paramInput2 = new JTextField();
+		panel.add(paramInput2);
+		paramInput2.setColumns(10);
+		
+		searchButton = new JButton("Търси");
+		searchButton.addActionListener(this);
+		panel.add(searchButton);
+		
+		JPanel panel_3 = new JPanel();
+		frame.getContentPane().add(panel_3, BorderLayout.CENTER);
+		panel_3.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		
+		draftImageLabel = new JLabel("");
+		draftImageLabel.setBounds(new Rectangle(0, 0, 10, 5));
+		panel_3.add(draftImageLabel);
+		
+		draftLabel = new JLabel("");
+		panel_3.add(draftLabel);
+		
+		kinematicsImageLabel = new JLabel("");
+		panel_3.add(kinematicsImageLabel);
+		
+		JPanel panel_4 = new JPanel();
+		FlowLayout flowLayout = (FlowLayout) panel_4.getLayout();
+		frame.getContentPane().add(panel_4, BorderLayout.SOUTH);
+		
+		JLabel label_3 = new JLabel("New label");
+		panel_4.add(label_3,FlowLayout.LEFT);
+		
+		JLabel label_4 = new JLabel("New label");
+		panel_4.add(label_4,FlowLayout.CENTER);
+		
+		JLabel label_5 = new JLabel("New label");
+		panel_4.add(label_5,FlowLayout.RIGHT);
+		
+		JMenuBar menuBar = new JMenuBar();
+		frame.setJMenuBar(menuBar);
+		
+		JMenu mnFile = new JMenu("File");
+		menuBar.add(mnFile);
+		
+		JMenu mnAbout = new JMenu("About");
+		menuBar.add(mnAbout);
 		
 		connectToSqlDb();
 
@@ -177,7 +191,12 @@ public class CuttingMachineCatalogue extends JFrame implements ActionListener {
 			Statement stmt = connection.createStatement();
 			int n = 1250;
 			ResultSet rs = stmt.executeQuery(String.format("SELECT lathe_info FROM lathes WHERE maxProcessedDiameter = %d", n));
-			parseImageFromDB(rs);
+			parseImageFromDB(rs,draftImageLabel);
+			 rs = stmt.executeQuery(String.format("SELECT lathe_kinematics FROM lathes WHERE maxProcessedDiameter = %d", n));
+			 parseImageFromDB(rs,kinematicsImageLabel);
+			 rs = stmt.executeQuery(String.format("SELECT lathe_draft FROM lathes WHERE maxProcessedDiameter = %d", n));
+			 parseImageFromDB(rs,draftLabel);
+
 		} catch (Exception ex) {
 			System.out.println(ex);
 			System.out.println(ex.getMessage());
@@ -213,7 +232,7 @@ public class CuttingMachineCatalogue extends JFrame implements ActionListener {
 				case TURNING:
 					TurningImpl turningImpl = new TurningImpl();
 					latheParameters = turningImpl.getLatheParameters(Integer.parseInt(paramInput1.getText()),
-							Integer.parseInt(paramInput2.getText()), Integer.parseInt(paramInput3.getText()));
+							Integer.parseInt(paramInput2.getText()));
 					break;
 				case DRILLING:
 					break;
@@ -229,7 +248,7 @@ public class CuttingMachineCatalogue extends JFrame implements ActionListener {
 
 	}
 
-	private void parseImageFromDB(ResultSet rs) throws IOException, SQLException {
+	private void parseImageFromDB(ResultSet rs, JLabel label) throws IOException, SQLException {
 		byte barr[] = null;
 		while (rs.next()) {
 			Blob b = rs.getBlob(1);
@@ -240,8 +259,11 @@ public class CuttingMachineCatalogue extends JFrame implements ActionListener {
 		File tmpFile = new File("tmpImage");
 		OutputStream targetFile= new FileOutputStream(tmpFile);
 		targetFile.write(barr);
+		BufferedImage bimg = ImageIO.read(tmpFile);
+		Image scaled = bimg.getScaledInstance(375, 300, Image.SCALE_SMOOTH); 
 		String ss=tmpFile.getAbsolutePath();
-		jcomp9.setIcon(new ImageIcon(ss));
+		label.setIcon(new ImageIcon(scaled));
+		//draftImageLabel.setSize(800, 600);
 		targetFile.close();
 	}
 }
