@@ -9,27 +9,12 @@ import static sofia.tu.kptm.main.Operations.GEAR_PROCESSING;
 import static sofia.tu.kptm.main.Operations.SCRAPING;
 
 import java.awt.BorderLayout;
-import java.awt.Container;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
-import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.sql.Blob;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-
-import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
@@ -39,20 +24,16 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.SwingConstants;
-
-import sofia.tu.kptm.impl.TurningImpl;
-import sofia.tu.kptm.machine.LatheParameters;
+import sofia.tu.kptm.impl.CatalogueService;
 
 @SuppressWarnings("rawtypes")
 public class CuttingMachineCatalogue implements ActionListener {
 
 	private static final String DEFAULT_DIAMETER = "Обработван диаметър";
-	private static final String DEFAULT_WIDTH = "Обработвана ширина";
-
+	private static final String DEFAULT_WIDTH = "Обработвана ширина (по избор)";
 	private JButton searchButton;
 	private JComboBox operationsBox;
 	private JLabel chooseProcessLabel;
@@ -64,16 +45,11 @@ public class CuttingMachineCatalogue implements ActionListener {
 	private JLabel machineNameLabel;
 	private JLabel parameter1;
 	private JLabel parameter2;
-	private JScrollPane scroll;
 	private JFrame frame;
 
-	private String operation;
-	private Container container;
-
-	/**
-	 * @author Kaloyan Proynov
-	 */
-	private LatheParameters latheParameters;
+	private String operation = TURNING;
+	private int param1;
+	private int param2;
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(() -> {
@@ -155,20 +131,14 @@ public class CuttingMachineCatalogue implements ActionListener {
 		JPanel panel_5 = new JPanel();
 		panel_4.add(panel_5);
 
-		JLabel label_4 = new JLabel("New label");
-		panel_5.add(label_4);
-		label_4.setHorizontalTextPosition(SwingConstants.CENTER);
-		label_4.setHorizontalAlignment(SwingConstants.CENTER);
+		JLabel infoLabel = new JLabel("Техническа характеристика на машината   	 ");
+		panel_5.add(infoLabel);
+		
+		JLabel draftLabel = new JLabel("Чертеж на машината   	 ");
+		panel_5.add(draftLabel);	
 
-		JLabel label_5 = new JLabel("New label");
-		panel_5.add(label_5);
-		label_5.setHorizontalTextPosition(SwingConstants.RIGHT);
-		label_5.setHorizontalAlignment(SwingConstants.RIGHT);
-
-		JLabel label_3 = new JLabel("New label");
-		panel_5.add(label_3);
-		label_3.setHorizontalTextPosition(SwingConstants.LEFT);
-		label_3.setHorizontalAlignment(SwingConstants.LEFT);
+		JLabel kinematicsLabel = new JLabel("Кинематика на машината  	");
+		panel_5.add(kinematicsLabel);
 
 		JMenuBar menuBar = new JMenuBar();
 		frame.setJMenuBar(menuBar);
@@ -178,32 +148,7 @@ public class CuttingMachineCatalogue implements ActionListener {
 
 		JMenu mnAbout = new JMenu("About");
 		menuBar.add(mnAbout);
-
-		connectToSqlDb();
-
-	}
-
-	private void connectToSqlDb() {
-		try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/catalogue?useSSL=false",
-				"root", "123456"); Statement stmt = connection.createStatement()) {
-
-			int n = 600;
-			ResultSet rs = stmt
-					.executeQuery(String.format("SELECT lathe_info FROM lathes WHERE maxProcessedDiameter = %d", n));
-			parseImageFromDB(rs, infoImageLabel);
-			rs = stmt.executeQuery(
-					String.format("SELECT lathe_kinematics FROM lathes WHERE maxProcessedDiameter = %d", n));
-			parseImageFromDB(rs, kinematicsImageLabel);
-			rs = stmt.executeQuery(String.format("SELECT lathe_draft FROM lathes WHERE maxProcessedDiameter = %d", n));
-			parseImageFromDB(rs, draftImageLabel);
-			rs = stmt.executeQuery(String.format("SELECT latheName FROM lathes WHERE maxProcessedDiameter = %d", n));
-			if (rs.next()) {
-				machineNameLabel.setText("Намерен струг с име: " + rs.getString(1));
-			}
-		} catch (Exception ex) {
-			System.out.println(ex);
-			System.out.println(ex.getMessage());
-		}
+		
 	}
 
 	@Override
@@ -211,32 +156,51 @@ public class CuttingMachineCatalogue implements ActionListener {
 		try {
 			Object source = e.getSource();
 			if (operationsBox.getSelectedItem().equals(TURNING)) {
+				showParameters();
 				parameter1.setText(DEFAULT_DIAMETER);
 				parameter2.setText(DEFAULT_WIDTH);
 				operation = TURNING;
 			} else if (operationsBox.getSelectedItem().equals(DRILLING)) {
-				parameter1.setText("Диаметър на свредло");
-				parameter2.setText("Брой подавания");
+				parameter1.setText("Диаметър на свредлото");
+				hideParameters();
 				operation = DRILLING;
-
 			} else if (operationsBox.getSelectedItem().equals(MILLING)) {
-				parameter1.setText("Диаметър");
+				parameter1.setText("Разстояние от оста на вретеното до работната повърнина на масата");
+				hideParameters();
 				operation = MILLING;
 			} else if (operationsBox.getSelectedItem().equals(GRINDING)) {
+				showParameters();
+				parameter1.setText(DEFAULT_DIAMETER);
+				parameter2.setText(DEFAULT_WIDTH);
 				operation = GRINDING;
 			} else if (operationsBox.getSelectedItem().equals(SCRAPING)) {
+				showParameters();
+				parameter1.setText(DEFAULT_DIAMETER);
+				parameter2.setText(DEFAULT_WIDTH);
 				operation = SCRAPING;
 			} else if (operationsBox.getSelectedItem().equals(GEAR_PROCESSING)) {
+				showParameters();
+				parameter1.setText("Модул на зъбно колело");
+				parameter2.setText("Външен диаметър");
 				operation = GEAR_PROCESSING;
 			} else if (operationsBox.getSelectedItem().equals(CUTTING)) {
+				parameter1.setText("Отрязван материал (кръгъл) в мм");
+				hideParameters();
 				operation = CUTTING;
 			}
 			if (source == searchButton) {
+				try {
 				switch (operation) {
 				case TURNING:
-					TurningImpl turningImpl = new TurningImpl();
-					latheParameters = turningImpl.getLatheParameters(Integer.parseInt(paramInput1.getText()),
-							Integer.parseInt(paramInput2.getText()));
+					CatalogueService catalogueService = new CatalogueService();
+					 param1 = Integer.parseInt(paramInput1.getText());
+					if(!paramInput2.getText().isBlank()) {
+					 param2 = Integer.parseInt(paramInput2.getText());
+					}
+					infoImageLabel.setIcon(new ImageIcon(catalogueService.getImage(param1, param2, getQueryForTurningOperation(param1, param2, "lathe_info"))));
+					draftImageLabel.setIcon(new ImageIcon(catalogueService.getImage(param1, param2, getQueryForTurningOperation(param1, param2, "lathe_draft"))));
+					kinematicsImageLabel.setIcon(new ImageIcon(catalogueService.getImage(param1, param2, getQueryForTurningOperation(param1, param2, "lathe_kinematics"))));
+					machineNameLabel.setText("Име на машина: " + catalogueService.getMachineName(param1, param2, getQueryForTurningOperation(param1, param2, "lathe_name")));
 					break;
 				case DRILLING:
 					break;
@@ -253,27 +217,32 @@ public class CuttingMachineCatalogue implements ActionListener {
 				default:
 					break;
 				}
+				}catch (NumberFormatException nfe) {
+					JOptionPane.showMessageDialog(frame, "Моля въведете цяло число в текстовото поле!","Грешка",JOptionPane.ERROR_MESSAGE);
+				}catch (Exception ex) {
+					System.out.println(ex.getMessage());
+				}
 			}
 
 		} catch (Exception ex) {
 			System.out.println(ex);
 		}
-		// TODO Auto-generated method stub
-
+	}
+	private void showParameters() {
+		parameter2.setVisible(true);
+		paramInput2.setVisible(true);
+	}
+	private void hideParameters() {
+		parameter2.setVisible(false);
+		paramInput2.setVisible(false);
+	}
+	
+	private String getQueryForTurningOperation(int param1, int param2, String column) {
+		String query = String.format("SELECT %s FROM lathes WHERE maxProcessedDiameter > %d ORDER BY maxProcessedDiameter ", column, param1);
+		if (param2 != 0) {
+			query = String.format("SELECT %s FROM lathes WHERE maxProcessedDiameter > %d AND maxProcessedWidth > %d ORDER BY maxProcessedDiameter ", column, param1 , param2);
+		}
+		return query;
 	}
 
-	private void parseImageFromDB(ResultSet rs, JLabel label) throws IOException, SQLException {
-		byte[] barr = null;
-		while (rs.next()) {
-			Blob b = rs.getBlob(1);
-			barr = b.getBytes(1, (int) b.length());
-		}
-		File tmpFile = new File("tmpImage");
-		try (OutputStream targetFile = new FileOutputStream(tmpFile)) {
-			targetFile.write(barr);
-			BufferedImage bimg = ImageIO.read(tmpFile);
-			Image scaled = bimg.getScaledInstance(375, 300, Image.SCALE_SMOOTH);
-			label.setIcon(new ImageIcon(scaled));
-		}
-	}
 }
