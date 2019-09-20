@@ -16,7 +16,8 @@ import javax.imageio.ImageIO;
 
 public class CatalogueService {
 
-	public synchronized String getMachineName(int param1, int param2, String query) {
+	public synchronized String getMachineName(int param1, int param2, String query)
+			throws MachineNotFoundException, SQLException {
 		ResultSet rs = null;
 		String name = null;
 		try (Connection connection = DriverManager.getConnection(
@@ -24,6 +25,7 @@ public class CatalogueService {
 				Statement stmt = connection.createStatement()) {
 			if (param2 == 0) {
 				rs = stmt.executeQuery(String.format(query, param1));
+				checkResult(rs);
 				if (rs.next()) {
 					name = rs.getNString(1);
 				}
@@ -33,13 +35,14 @@ public class CatalogueService {
 					name = rs.getNString(1);
 				}
 			}
-		} catch (Exception ex) {
-			System.out.println(ex);
+		} catch (MachineNotFoundException mnfe) {
+			throw new MachineNotFoundException(mnfe.getMessage());
 		}
 		return name;
 	}
 
-	public synchronized Image getImage(int param1, int param2, String query) throws IOException, SQLException {
+	public synchronized Image getImage(int param1, int param2, String query)
+			throws IOException, SQLException, MachineNotFoundException {
 		ResultSet rs = null;
 		Image image = null;
 		try (Connection connection = DriverManager.getConnection(
@@ -47,14 +50,15 @@ public class CatalogueService {
 				Statement stmt = connection.createStatement()) {
 			if (param2 == 0) {
 				rs = stmt.executeQuery(String.format(query, param1));
+				checkResult(rs);
 				image = parseImageFromDB(rs);
 			} else {
 				rs = stmt.executeQuery(String.format(query, param1, param2));
+				checkResult(rs);
 				image = parseImageFromDB(rs);
 			}
-		} catch (Exception ex) {
-			System.out.println(ex);
-			System.out.println(ex.getMessage());
+		} catch (MachineNotFoundException mnfe) {
+			throw new MachineNotFoundException(mnfe.getMessage());
 		}
 		return image;
 	}
@@ -70,6 +74,12 @@ public class CatalogueService {
 			targetFile.write(barr);
 			BufferedImage bimg = ImageIO.read(tmpFile);
 			return bimg.getScaledInstance(375, 300, Image.SCALE_SMOOTH);
+		}
+	}
+
+	private void checkResult(ResultSet rs) throws MachineNotFoundException, SQLException {
+		if (!rs.next()) {
+			throw new MachineNotFoundException("Не беше намерена машина в каталога за подадените параметри!");
 		}
 	}
 }

@@ -28,6 +28,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import sofia.tu.kptm.impl.CatalogueService;
+import sofia.tu.kptm.impl.MachineNotFoundException;
 
 @SuppressWarnings("rawtypes")
 public class CuttingMachineCatalogue implements ActionListener {
@@ -219,8 +220,11 @@ public class CuttingMachineCatalogue implements ActionListener {
 				}
 				}catch (NumberFormatException nfe) {
 					JOptionPane.showMessageDialog(frame, "Моля въведете цяло число в текстовото поле!","Грешка",JOptionPane.ERROR_MESSAGE);
+				}catch (MachineNotFoundException mnfe) {
+					JOptionPane.showMessageDialog(frame, mnfe.getMessage(), "Инфо", JOptionPane.INFORMATION_MESSAGE);
 				}catch (Exception ex) {
-					System.out.println(ex.getMessage());
+					JOptionPane.showMessageDialog(frame,"Възникна неочаквана грешка" , "Грешка", JOptionPane.ERROR_MESSAGE);
+					ex.printStackTrace();
 				}
 			}
 
