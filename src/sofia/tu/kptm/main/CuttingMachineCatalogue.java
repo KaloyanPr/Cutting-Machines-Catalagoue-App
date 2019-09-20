@@ -242,9 +242,9 @@ public class CuttingMachineCatalogue implements ActionListener {
 	}
 	
 	private String getQueryForTurningOperation(int param1, int param2, String column) {
-		String query = String.format("SELECT %s FROM lathes WHERE maxProcessedDiameter > %d ORDER BY maxProcessedDiameter ", column, param1);
+		String query = String.format("SELECT %s FROM lathes WHERE maxProcessedDiameter >= %d ORDER BY maxProcessedDiameter ", column, param1);
 		if (param2 != 0) {
-			query = String.format("SELECT %s FROM lathes WHERE maxProcessedDiameter > %d AND maxProcessedWidth > %d ORDER BY maxProcessedDiameter ", column, param1 , param2);
+			query = String.format("SELECT %s FROM lathes WHERE maxProcessedDiameter >= %d AND maxProcessedWidth > %d ORDER BY maxProcessedDiameter ", column, param1 , param2);
 		}
 		return query;
 	}

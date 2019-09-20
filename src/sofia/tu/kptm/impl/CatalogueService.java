@@ -26,14 +26,11 @@ public class CatalogueService {
 			if (param2 == 0) {
 				rs = stmt.executeQuery(String.format(query, param1));
 				checkResult(rs);
-				if (rs.next()) {
-					name = rs.getNString(1);
-				}
+				name = rs.getNString(1);
 			} else {
 				rs = stmt.executeQuery(String.format(query, param1, param2));
-				if (rs.next()) {
-					name = rs.getNString(1);
-				}
+				checkResult(rs);
+				name = rs.getNString(1);	
 			}
 		} catch (MachineNotFoundException mnfe) {
 			throw new MachineNotFoundException(mnfe.getMessage());
@@ -65,7 +62,7 @@ public class CatalogueService {
 
 	public Image parseImageFromDB(ResultSet rs) throws IOException, SQLException {
 		byte[] barr = null;
-		if (rs.next()) {
+		if (rs.first()) {
 			Blob b = rs.getBlob(1);
 			barr = b.getBytes(1, (int) b.length());
 		}
@@ -78,7 +75,7 @@ public class CatalogueService {
 	}
 
 	private void checkResult(ResultSet rs) throws MachineNotFoundException, SQLException {
-		if (!rs.next()) {
+		if (!rs.first()) {
 			throw new MachineNotFoundException("Не беше намерена машина в каталога за подадените параметри!");
 		}
 	}
