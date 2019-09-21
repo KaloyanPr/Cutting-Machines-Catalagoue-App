@@ -16,7 +16,7 @@ import javax.imageio.ImageIO;
 
 public class CatalogueService {
 
-	public synchronized String getMachineName(int param1, int param2, String query)
+	public String getMachineName(int param1, int param2, String query)
 			throws MachineNotFoundException, SQLException {
 		ResultSet rs = null;
 		String name = null;
@@ -38,7 +38,7 @@ public class CatalogueService {
 		return name;
 	}
 
-	public synchronized Image getImage(int param1, int param2, String query)
+	public Image getImage(int param1, int param2, String query)
 			throws IOException, SQLException, MachineNotFoundException {
 		ResultSet rs = null;
 		Image image = null;
