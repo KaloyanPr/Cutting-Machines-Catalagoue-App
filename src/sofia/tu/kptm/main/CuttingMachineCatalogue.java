@@ -38,7 +38,7 @@ public class CuttingMachineCatalogue implements ActionListener {
 
 	private static final String DEFAULT_DIAMETER = "Обработван диаметър в мм";
 	private static final String DEFAULT_WIDTH = "Обработвана ширина (по избор) в мм";
-	private static final String NAME_OF_MACHINE = "Име на машина: ";
+	private static final String NAME_OF_MACHINE = "Име на намерена машина: ";
 	private static final String ERROR_TITLE = "Грешка";
 	private static final String INFO_TITLE = "Инфо";
 
@@ -81,7 +81,7 @@ public class CuttingMachineCatalogue implements ActionListener {
 	public CuttingMachineCatalogue() {
 		frame = new JFrame();
 		frame.setTitle("Cutting Machines Catalogue");
-		frame.setBounds(100, 100, 1158, 500);
+		frame.setBounds(100, 100, 1158, 525);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		panel = new JPanel();
@@ -144,19 +144,23 @@ public class CuttingMachineCatalogue implements ActionListener {
 		panel6 = new JPanel();
 		panel4.add(panel6);
 
-		machineNameLabel = new JLabel("");
+		machineNameLabel = new JLabel(" ");
 		panel6.add(machineNameLabel);
 
 		panel5 = new JPanel();
+		panel5.setLayout(null);
 		panel4.add(panel5);
 
-		infoLabel = new JLabel("Техническа характеристика на машината   	 ");
+		infoLabel = new JLabel("Техническа характеристика на машината");
+		infoLabel.setBounds(100, -10, 300, 30);
 		panel5.add(infoLabel);
 
-		draftLabel = new JLabel("Чертеж на машината   	 ");
+		draftLabel = new JLabel("Чертеж на машината");
+		draftLabel.setBounds(510, -10, 300, 30);
 		panel5.add(draftLabel);
 
-		kinematicsLabel = new JLabel("Кинематика на машината  	");
+		kinematicsLabel = new JLabel("Кинематика на машината");
+		kinematicsLabel.setBounds(835, -10, 300, 30);
 		panel5.add(kinematicsLabel);
 
 		menuBar = new JMenuBar();
@@ -343,7 +347,8 @@ public class CuttingMachineCatalogue implements ActionListener {
 					"SELECT %s FROM grinders WHERE maxProcessedDiameter >= %d ORDER BY maxProcessedDiameter ", column,
 					param1);
 		}
-		return String.format("SELECT %s FROM grinders WHERE maxProcessedWidth >= %d ORDER BY maxProcessedWidth ", column, param2);
+		return String.format("SELECT %s FROM grinders WHERE maxProcessedWidth >= %d ORDER BY maxProcessedWidth ",
+				column, param2);
 	}
 
 	private String getQueryForScrapingOperation(int param1, int param2, String column) {
@@ -352,7 +357,8 @@ public class CuttingMachineCatalogue implements ActionListener {
 					"SELECT %s FROM scraping WHERE maxProcessedDiameter >= %d ORDER BY maxProcessedDiameter ", column,
 					param1);
 		}
-		return String.format("SELECT %s FROM scraping WHERE maxProcessedWidth >= %d ORDER BY maxProcessedWidth ", column, param2);
+		return String.format("SELECT %s FROM scraping WHERE maxProcessedWidth >= %d ORDER BY maxProcessedWidth ",
+				column, param2);
 	}
 
 	private String getQueryForGearProcessingOperation(int param1, int param2, String column) {
