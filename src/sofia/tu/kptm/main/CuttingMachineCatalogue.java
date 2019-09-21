@@ -40,7 +40,8 @@ public class CuttingMachineCatalogue implements ActionListener {
 	private static final String DEFAULT_WIDTH = "Обработвана ширина (по избор) в мм";
 	private static final String NAME_OF_MACHINE = "Име на машина: ";
 	private static final String ERROR_TITLE = "Грешка";
-	
+	private static final String INFO_TITLE = "Инфо";
+
 	private JFrame frame;
 	private JPanel panel;
 	private JPanel panel1;
@@ -152,7 +153,7 @@ public class CuttingMachineCatalogue implements ActionListener {
 		infoLabel = new JLabel("Техническа характеристика на машината   	 ");
 		panel5.add(infoLabel);
 
-	    draftLabel = new JLabel("Чертеж на машината   	 ");
+		draftLabel = new JLabel("Чертеж на машината   	 ");
 		panel5.add(draftLabel);
 
 		kinematicsLabel = new JLabel("Кинематика на машината  	");
@@ -209,6 +210,8 @@ public class CuttingMachineCatalogue implements ActionListener {
 			}
 			if (source == searchButton) {
 				handleSearchOperation();
+				paramInput1.setText("");
+				paramInput2.setText("");
 			}
 		} catch (NumberFormatException nfe) {
 			JOptionPane.showMessageDialog(frame, "Моля въведете цяло число в текстовото поле!", ERROR_TITLE,
@@ -216,7 +219,7 @@ public class CuttingMachineCatalogue implements ActionListener {
 		} catch (IllegalArgumentException iae) {
 			JOptionPane.showMessageDialog(frame, iae.getMessage(), ERROR_TITLE, JOptionPane.ERROR_MESSAGE);
 		} catch (MachineNotFoundException mnfe) {
-			JOptionPane.showMessageDialog(frame, mnfe.getMessage(), "Инфо", JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(frame, mnfe.getMessage(), INFO_TITLE, JOptionPane.INFORMATION_MESSAGE);
 		} catch (Exception ex) {
 			JOptionPane.showMessageDialog(frame, "Възникна неочаквана грешка", ERROR_TITLE, JOptionPane.ERROR_MESSAGE);
 			ex.printStackTrace();
@@ -226,15 +229,15 @@ public class CuttingMachineCatalogue implements ActionListener {
 	private void handleSearchOperation() throws IOException, SQLException, MachineNotFoundException {
 		CatalogueService catalogueService = new CatalogueService();
 		int param1 = Integer.parseInt(paramInput1.getText());
-		if (param1 < 0) {
+		int param2 = 0;
+		if (!paramInput2.getText().isBlank()) {
+			param2 = Integer.parseInt(paramInput2.getText());
+		}
+		if (param1 < 0 || param2 < 0) {
 			throw new IllegalArgumentException("Параметрите не може да са отрицателни!");
 		}
-		int param2 = 0;
 		switch (operation) {
 		case TURNING:
-			if (!paramInput2.getText().isBlank()) {
-				param2 = Integer.parseInt(paramInput2.getText());
-			}
 			infoImageLabel.setIcon(new ImageIcon(catalogueService.getImage(param1, param2,
 					getQueryForTurningOperation(param1, param2, "lathe_info"))));
 			draftImageLabel.setIcon(new ImageIcon(catalogueService.getImage(param1, param2,
@@ -265,8 +268,26 @@ public class CuttingMachineCatalogue implements ActionListener {
 					getQueryForMillingOperation(param1, "mill_name")));
 			break;
 		case GRINDING:
+			param1 = checkIncompatibleParams(param1, param2);
+			infoImageLabel.setIcon(new ImageIcon(catalogueService.getImage(param1, param2,
+					getQueryForGrindingOperation(param1, param2, "grind_info"))));
+			draftImageLabel.setIcon(new ImageIcon(catalogueService.getImage(param1, param2,
+					getQueryForGrindingOperation(param1, param2, "grind_draft"))));
+			kinematicsImageLabel.setIcon(new ImageIcon(catalogueService.getImage(param1, param2,
+					getQueryForGrindingOperation(param1, param2, "grind_kinematics"))));
+			machineNameLabel.setText(NAME_OF_MACHINE + catalogueService.getMachineName(param1, param2,
+					getQueryForGrindingOperation(param1, param2, "grind_name")));
 			break;
 		case SCRAPING:
+			param1 = checkIncompatibleParams(param1, param2);
+			infoImageLabel.setIcon(new ImageIcon(catalogueService.getImage(param1, param2,
+					getQueryForScrapingOperation(param1, param2, "scraper_info"))));
+			draftImageLabel.setIcon(new ImageIcon(catalogueService.getImage(param1, param2,
+					getQueryForScrapingOperation(param1, param2, "scraper_draft"))));
+			kinematicsImageLabel.setIcon(new ImageIcon(catalogueService.getImage(param1, param2,
+					getQueryForScrapingOperation(param1, param2, "scraper_kinematics"))));
+			machineNameLabel.setText(NAME_OF_MACHINE + catalogueService.getMachineName(param1, param2,
+					getQueryForScrapingOperation(param1, param2, "scraper_name")));
 			break;
 		case GEAR_PROCESSING:
 			param2 = Integer.parseInt(paramInput2.getText());
@@ -280,28 +301,18 @@ public class CuttingMachineCatalogue implements ActionListener {
 					getQueryForGearProcessingOperation(param1, param2, "gear_name")));
 			break;
 		case CUTTING:
-			infoImageLabel.setIcon(new ImageIcon(catalogueService.getImage(param1, param2,
-					getQueryForCuttingOperation(param1,"cutter_info"))));
-			draftImageLabel.setIcon(new ImageIcon(catalogueService.getImage(param1, param2,
-					getQueryForCuttingOperation(param1,"cutter_draft"))));
+			infoImageLabel.setIcon(new ImageIcon(
+					catalogueService.getImage(param1, param2, getQueryForCuttingOperation(param1, "cutter_info"))));
+			draftImageLabel.setIcon(new ImageIcon(
+					catalogueService.getImage(param1, param2, getQueryForCuttingOperation(param1, "cutter_draft"))));
 			kinematicsImageLabel.setIcon(new ImageIcon(catalogueService.getImage(param1, param2,
-					getQueryForCuttingOperation(param1,"cutter_kinematics"))));
+					getQueryForCuttingOperation(param1, "cutter_kinematics"))));
 			machineNameLabel.setText(NAME_OF_MACHINE + catalogueService.getMachineName(param1, param2,
-					getQueryForCuttingOperation(param1,"cutter_name")));
+					getQueryForCuttingOperation(param1, "cutter_name")));
 			break;
 		default:
 			break;
 		}
-	}
-
-	private void showParameters() {
-		parameter2.setVisible(true);
-		paramInput2.setVisible(true);
-	}
-
-	private void hideParameters() {
-		parameter2.setVisible(false);
-		paramInput2.setVisible(false);
 	}
 
 	private String getQueryForTurningOperation(int param1, int param2, String column) {
@@ -332,7 +343,16 @@ public class CuttingMachineCatalogue implements ActionListener {
 					"SELECT %s FROM grinders WHERE maxProcessedDiameter >= %d ORDER BY maxProcessedDiameter ", column,
 					param1);
 		}
-		return String.format("SELECT %s FROM grinders WHERE maxProcessedWidth >= %d ", column, param2);
+		return String.format("SELECT %s FROM grinders WHERE maxProcessedWidth >= %d ORDER BY maxProcessedWidth ", column, param2);
+	}
+
+	private String getQueryForScrapingOperation(int param1, int param2, String column) {
+		if (param2 == 0) {
+			return String.format(
+					"SELECT %s FROM scraping WHERE maxProcessedDiameter >= %d ORDER BY maxProcessedDiameter ", column,
+					param1);
+		}
+		return String.format("SELECT %s FROM scraping WHERE maxProcessedWidth >= %d ORDER BY maxProcessedWidth ", column, param2);
 	}
 
 	private String getQueryForGearProcessingOperation(int param1, int param2, String column) {
@@ -340,8 +360,29 @@ public class CuttingMachineCatalogue implements ActionListener {
 				"SELECT %s FROM gears WHERE maxModule >= %d AND maxExternalDiameter >= %d ORDER BY maxExternalDiameter",
 				column, param1, param2);
 	}
-	
+
 	private String getQueryForCuttingOperation(int param1, String column) {
-		return String.format("SELECT %s FROM cutting where maxCutMaterial >= %d ORDER BY maxCutMaterial", column, param1);
+		return String.format("SELECT %s FROM cutting where maxCutMaterial >= %d ORDER BY maxCutMaterial", column,
+				param1);
+	}
+
+	private int checkIncompatibleParams(int param1, int param2) {
+		if (param2 != 0) {
+			param1 = 0;
+			JOptionPane.showMessageDialog(frame,
+					"Диаметърът се приема за 0, когато има зададена ширина за тази операция.", INFO_TITLE,
+					JOptionPane.INFORMATION_MESSAGE);
+		}
+		return param1;
+	}
+
+	private void showParameters() {
+		parameter2.setVisible(true);
+		paramInput2.setVisible(true);
+	}
+
+	private void hideParameters() {
+		parameter2.setVisible(false);
+		paramInput2.setVisible(false);
 	}
 }
