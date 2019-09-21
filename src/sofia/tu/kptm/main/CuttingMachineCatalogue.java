@@ -15,6 +15,9 @@ import java.awt.GridLayout;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.sql.SQLException;
+
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
@@ -33,24 +36,38 @@ import sofia.tu.kptm.impl.MachineNotFoundException;
 @SuppressWarnings("rawtypes")
 public class CuttingMachineCatalogue implements ActionListener {
 
-	private static final String DEFAULT_DIAMETER = "Обработван диаметър";
-	private static final String DEFAULT_WIDTH = "Обработвана ширина (по избор)";
+	private static final String DEFAULT_DIAMETER = "Обработван диаметър в мм";
+	private static final String DEFAULT_WIDTH = "Обработвана ширина (по избор) в мм";
+	private static final String NAME_OF_MACHINE = "Име на машина: ";
+	private static final String ERROR_TITLE = "Грешка";
+	
+	private JFrame frame;
+	private JPanel panel;
+	private JPanel panel1;
+	private JPanel panel2;
+	private JPanel panel3;
+	private JPanel panel4;
+	private JPanel panel5;
+	private JPanel panel6;
 	private JButton searchButton;
 	private JComboBox operationsBox;
 	private JLabel chooseProcessLabel;
 	private JTextField paramInput1;
 	private JTextField paramInput2;
+	private JLabel draftLabel;
+	private JLabel infoLabel;
+	private JLabel kinematicsLabel;
 	private JLabel draftImageLabel;
 	private JLabel infoImageLabel;
 	private JLabel kinematicsImageLabel;
 	private JLabel machineNameLabel;
 	private JLabel parameter1;
 	private JLabel parameter2;
-	private JFrame frame;
+	private JMenuBar menuBar;
+	private JMenu mnFile;
+	private JMenu mnAbout;
 
 	private String operation = TURNING;
-	private int param1;
-	private int param2;
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(() -> {
@@ -59,39 +76,39 @@ public class CuttingMachineCatalogue implements ActionListener {
 		});
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ "unchecked" })
 	public CuttingMachineCatalogue() {
 		frame = new JFrame();
 		frame.setTitle("Cutting Machines Catalogue");
 		frame.setBounds(100, 100, 1158, 500);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		JPanel panel = new JPanel();
+		panel = new JPanel();
 		frame.getContentPane().add(panel, BorderLayout.NORTH);
 
 		chooseProcessLabel = new JLabel("Избор");
 		panel.add(chooseProcessLabel);
 
-		JPanel panel_1 = new JPanel();
-		panel.add(panel_1);
-		panel_1.setLayout(new BoxLayout(panel_1, BoxLayout.X_AXIS));
+		panel1 = new JPanel();
+		panel.add(panel1);
+		panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
 
-		JPanel panel_2 = new JPanel();
-		panel_1.add(panel_2);
-		panel_2.setLayout(new GridLayout(0, 2, 0, 0));
+		panel2 = new JPanel();
+		panel1.add(panel2);
+		panel2.setLayout(new GridLayout(0, 2, 0, 0));
 
 		operationsBox = new JComboBox();
 		operationsBox.setModel(new DefaultComboBoxModel(
 				new String[] { TURNING, MILLING, DRILLING, SCRAPING, GRINDING, GEAR_PROCESSING, CUTTING }));
 		operationsBox.addActionListener(this);
-		panel_2.add(operationsBox);
+		panel2.add(operationsBox);
 
 		parameter1 = new JLabel(DEFAULT_DIAMETER);
-		panel_1.add(parameter1);
+		panel1.add(parameter1);
 
 		paramInput1 = new JTextField();
 		paramInput1.setText("");
-		panel_1.add(paramInput1);
+		panel1.add(paramInput1);
 		paramInput1.setColumns(10);
 
 		parameter2 = new JLabel(DEFAULT_WIDTH);
@@ -105,51 +122,51 @@ public class CuttingMachineCatalogue implements ActionListener {
 		searchButton.addActionListener(this);
 		panel.add(searchButton);
 
-		JPanel panel_3 = new JPanel();
-		frame.getContentPane().add(panel_3, BorderLayout.CENTER);
-		panel_3.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		panel3 = new JPanel();
+		frame.getContentPane().add(panel3, BorderLayout.CENTER);
+		panel3.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
 		infoImageLabel = new JLabel("");
 		infoImageLabel.setBounds(new Rectangle(0, 0, 10, 5));
-		panel_3.add(infoImageLabel);
+		panel3.add(infoImageLabel);
 
 		draftImageLabel = new JLabel("");
-		panel_3.add(draftImageLabel);
+		panel3.add(draftImageLabel);
 
 		kinematicsImageLabel = new JLabel("");
-		panel_3.add(kinematicsImageLabel);
+		panel3.add(kinematicsImageLabel);
 
-		JPanel panel_4 = new JPanel();
-		frame.getContentPane().add(panel_4, BorderLayout.SOUTH);
-		panel_4.setLayout(new GridLayout(2, 1, 0, 0));
+		panel4 = new JPanel();
+		frame.getContentPane().add(panel4, BorderLayout.SOUTH);
+		panel4.setLayout(new GridLayout(2, 1, 0, 0));
 
-		JPanel panel_6 = new JPanel();
-		panel_4.add(panel_6);
+		panel6 = new JPanel();
+		panel4.add(panel6);
 
 		machineNameLabel = new JLabel("");
-		panel_6.add(machineNameLabel);
+		panel6.add(machineNameLabel);
 
-		JPanel panel_5 = new JPanel();
-		panel_4.add(panel_5);
+		panel5 = new JPanel();
+		panel4.add(panel5);
 
-		JLabel infoLabel = new JLabel("Техническа характеристика на машината   	 ");
-		panel_5.add(infoLabel);
-		
-		JLabel draftLabel = new JLabel("Чертеж на машината   	 ");
-		panel_5.add(draftLabel);	
+		infoLabel = new JLabel("Техническа характеристика на машината   	 ");
+		panel5.add(infoLabel);
 
-		JLabel kinematicsLabel = new JLabel("Кинематика на машината  	");
-		panel_5.add(kinematicsLabel);
+	    draftLabel = new JLabel("Чертеж на машината   	 ");
+		panel5.add(draftLabel);
 
-		JMenuBar menuBar = new JMenuBar();
+		kinematicsLabel = new JLabel("Кинематика на машината  	");
+		panel5.add(kinematicsLabel);
+
+		menuBar = new JMenuBar();
 		frame.setJMenuBar(menuBar);
 
-		JMenu mnFile = new JMenu("File");
+		mnFile = new JMenu("File");
 		menuBar.add(mnFile);
 
-		JMenu mnAbout = new JMenu("About");
+		mnAbout = new JMenu("About");
 		menuBar.add(mnAbout);
-		
+
 	}
 
 	@Override
@@ -162,11 +179,12 @@ public class CuttingMachineCatalogue implements ActionListener {
 				parameter2.setText(DEFAULT_WIDTH);
 				operation = TURNING;
 			} else if (operationsBox.getSelectedItem().equals(DRILLING)) {
-				parameter1.setText("Диаметър на свредлото");
+				parameter1.setText("Диаметър на свредлото в мм ");
 				hideParameters();
 				operation = DRILLING;
 			} else if (operationsBox.getSelectedItem().equals(MILLING)) {
-				parameter1.setText("Разстояние от оста на вретеното до работната повърнина на масата");
+				parameter1
+						.setText("Разстояние от оста на вретеното до работната повърнина на масата (максимално) в мм ");
 				hideParameters();
 				operation = MILLING;
 			} else if (operationsBox.getSelectedItem().equals(GRINDING)) {
@@ -181,8 +199,8 @@ public class CuttingMachineCatalogue implements ActionListener {
 				operation = SCRAPING;
 			} else if (operationsBox.getSelectedItem().equals(GEAR_PROCESSING)) {
 				showParameters();
-				parameter1.setText("Модул на зъбно колело");
-				parameter2.setText("Външен диаметър");
+				parameter1.setText("Модул на зъбно колело в мм ");
+				parameter2.setText("Външен диаметър в мм ");
 				operation = GEAR_PROCESSING;
 			} else if (operationsBox.getSelectedItem().equals(CUTTING)) {
 				parameter1.setText("Отрязван материал (кръгъл) в мм");
@@ -190,63 +208,140 @@ public class CuttingMachineCatalogue implements ActionListener {
 				operation = CUTTING;
 			}
 			if (source == searchButton) {
-				try {
-				switch (operation) {
-				case TURNING:
-					CatalogueService catalogueService = new CatalogueService();
-					 param1 = Integer.parseInt(paramInput1.getText());
-					if(!paramInput2.getText().isBlank()) {
-					 param2 = Integer.parseInt(paramInput2.getText());
-					}
-					infoImageLabel.setIcon(new ImageIcon(catalogueService.getImage(param1, param2, getQueryForTurningOperation(param1, param2, "lathe_info"))));
-					draftImageLabel.setIcon(new ImageIcon(catalogueService.getImage(param1, param2, getQueryForTurningOperation(param1, param2, "lathe_draft"))));
-					kinematicsImageLabel.setIcon(new ImageIcon(catalogueService.getImage(param1, param2, getQueryForTurningOperation(param1, param2, "lathe_kinematics"))));
-					machineNameLabel.setText("Име на машина: " + catalogueService.getMachineName(param1, param2, getQueryForTurningOperation(param1, param2, "lathe_name")));
-					break;
-				case DRILLING:
-					break;
-				case MILLING:
-					break;
-				case GRINDING:
-					break;
-				case SCRAPING:
-					break;
-				case GEAR_PROCESSING:
-					break;
-				case CUTTING:
-					break;
-				default:
-					break;
-				}
-				}catch (NumberFormatException nfe) {
-					JOptionPane.showMessageDialog(frame, "Моля въведете цяло число в текстовото поле!","Грешка",JOptionPane.ERROR_MESSAGE);
-				}catch (MachineNotFoundException mnfe) {
-					JOptionPane.showMessageDialog(frame, mnfe.getMessage(), "Инфо", JOptionPane.INFORMATION_MESSAGE);
-				}catch (Exception ex) {
-					JOptionPane.showMessageDialog(frame,"Възникна неочаквана грешка" , "Грешка", JOptionPane.ERROR_MESSAGE);
-					ex.printStackTrace();
-				}
+				handleSearchOperation();
 			}
-
+		} catch (NumberFormatException nfe) {
+			JOptionPane.showMessageDialog(frame, "Моля въведете цяло число в текстовото поле!", ERROR_TITLE,
+					JOptionPane.ERROR_MESSAGE);
+		} catch (IllegalArgumentException iae) {
+			JOptionPane.showMessageDialog(frame, iae.getMessage(), ERROR_TITLE, JOptionPane.ERROR_MESSAGE);
+		} catch (MachineNotFoundException mnfe) {
+			JOptionPane.showMessageDialog(frame, mnfe.getMessage(), "Инфо", JOptionPane.INFORMATION_MESSAGE);
 		} catch (Exception ex) {
-			System.out.println(ex);
+			JOptionPane.showMessageDialog(frame, "Възникна неочаквана грешка", ERROR_TITLE, JOptionPane.ERROR_MESSAGE);
+			ex.printStackTrace();
 		}
 	}
+
+	private void handleSearchOperation() throws IOException, SQLException, MachineNotFoundException {
+		CatalogueService catalogueService = new CatalogueService();
+		int param1 = Integer.parseInt(paramInput1.getText());
+		if (param1 < 0) {
+			throw new IllegalArgumentException("Параметрите не може да са отрицателни!");
+		}
+		int param2 = 0;
+		switch (operation) {
+		case TURNING:
+			if (!paramInput2.getText().isBlank()) {
+				param2 = Integer.parseInt(paramInput2.getText());
+			}
+			infoImageLabel.setIcon(new ImageIcon(catalogueService.getImage(param1, param2,
+					getQueryForTurningOperation(param1, param2, "lathe_info"))));
+			draftImageLabel.setIcon(new ImageIcon(catalogueService.getImage(param1, param2,
+					getQueryForTurningOperation(param1, param2, "lathe_draft"))));
+			kinematicsImageLabel.setIcon(new ImageIcon(catalogueService.getImage(param1, param2,
+					getQueryForTurningOperation(param1, param2, "lathe_kinematics"))));
+			machineNameLabel.setText(NAME_OF_MACHINE + catalogueService.getMachineName(param1, param2,
+					getQueryForTurningOperation(param1, param2, "lathe_name")));
+			break;
+		case DRILLING:
+			infoImageLabel.setIcon(new ImageIcon(
+					catalogueService.getImage(param1, param2, getQueryForDrillingOperation(param1, "drill_info"))));
+			draftImageLabel.setIcon(new ImageIcon(
+					catalogueService.getImage(param1, param2, getQueryForDrillingOperation(param1, "drill_draft"))));
+			kinematicsImageLabel.setIcon(new ImageIcon(catalogueService.getImage(param1, param2,
+					getQueryForDrillingOperation(param1, "drill_kinematics"))));
+			machineNameLabel.setText(NAME_OF_MACHINE + catalogueService.getMachineName(param1, param2,
+					getQueryForDrillingOperation(param1, "drill_name")));
+			break;
+		case MILLING:
+			infoImageLabel.setIcon(new ImageIcon(
+					catalogueService.getImage(param1, param2, getQueryForMillingOperation(param1, "mill_info"))));
+			draftImageLabel.setIcon(new ImageIcon(
+					catalogueService.getImage(param1, param2, getQueryForMillingOperation(param1, "mill_draft"))));
+			kinematicsImageLabel.setIcon(new ImageIcon(
+					catalogueService.getImage(param1, param2, getQueryForMillingOperation(param1, "mill_kinematics"))));
+			machineNameLabel.setText(NAME_OF_MACHINE + catalogueService.getMachineName(param1, param2,
+					getQueryForMillingOperation(param1, "mill_name")));
+			break;
+		case GRINDING:
+			break;
+		case SCRAPING:
+			break;
+		case GEAR_PROCESSING:
+			param2 = Integer.parseInt(paramInput2.getText());
+			infoImageLabel.setIcon(new ImageIcon(catalogueService.getImage(param1, param2,
+					getQueryForGearProcessingOperation(param1, param2, "gear_info"))));
+			draftImageLabel.setIcon(new ImageIcon(catalogueService.getImage(param1, param2,
+					getQueryForGearProcessingOperation(param1, param2, "gear_draft"))));
+			kinematicsImageLabel.setIcon(new ImageIcon(catalogueService.getImage(param1, param2,
+					getQueryForGearProcessingOperation(param1, param2, "gear_kinematics"))));
+			machineNameLabel.setText(NAME_OF_MACHINE + catalogueService.getMachineName(param1, param2,
+					getQueryForGearProcessingOperation(param1, param2, "gear_name")));
+			break;
+		case CUTTING:
+			infoImageLabel.setIcon(new ImageIcon(catalogueService.getImage(param1, param2,
+					getQueryForCuttingOperation(param1,"cutter_info"))));
+			draftImageLabel.setIcon(new ImageIcon(catalogueService.getImage(param1, param2,
+					getQueryForCuttingOperation(param1,"cutter_draft"))));
+			kinematicsImageLabel.setIcon(new ImageIcon(catalogueService.getImage(param1, param2,
+					getQueryForCuttingOperation(param1,"cutter_kinematics"))));
+			machineNameLabel.setText(NAME_OF_MACHINE + catalogueService.getMachineName(param1, param2,
+					getQueryForCuttingOperation(param1,"cutter_name")));
+			break;
+		default:
+			break;
+		}
+	}
+
 	private void showParameters() {
 		parameter2.setVisible(true);
 		paramInput2.setVisible(true);
 	}
+
 	private void hideParameters() {
 		parameter2.setVisible(false);
 		paramInput2.setVisible(false);
 	}
-	
+
 	private String getQueryForTurningOperation(int param1, int param2, String column) {
-		String query = String.format("SELECT %s FROM lathes WHERE maxProcessedDiameter >= %d ORDER BY maxProcessedDiameter ", column, param1);
-		if (param2 != 0) {
-			query = String.format("SELECT %s FROM lathes WHERE maxProcessedDiameter >= %d AND maxProcessedWidth > %d ORDER BY maxProcessedDiameter ", column, param1 , param2);
+		if (param2 == 0) {
+			return String.format(
+					"SELECT %s FROM lathes WHERE maxProcessedDiameter >= %d ORDER BY maxProcessedDiameter ", column,
+					param1);
 		}
-		return query;
+
+		return String.format(
+				"SELECT %s FROM lathes WHERE maxProcessedDiameter >= %d AND maxProcessedWidth > %d ORDER BY maxProcessedDiameter ",
+				column, param1, param2);
+
 	}
 
+	private String getQueryForDrillingOperation(int param1, String column) {
+		return String.format("SELECT %s FROM drills WHERE drillDiameter >= %d ORDER BY drillDiameter", column, param1);
+	}
+
+	private String getQueryForMillingOperation(int param1, String column) {
+		return String.format("SELECT %s FROM mills WHERE maxDistance >= %d AND minDistance <= %d ORDER BY maxDistance",
+				column, param1, param1);
+	}
+
+	private String getQueryForGrindingOperation(int param1, int param2, String column) {
+		if (param2 == 0) {
+			return String.format(
+					"SELECT %s FROM grinders WHERE maxProcessedDiameter >= %d ORDER BY maxProcessedDiameter ", column,
+					param1);
+		}
+		return String.format("SELECT %s FROM grinders WHERE maxProcessedWidth >= %d ", column, param2);
+	}
+
+	private String getQueryForGearProcessingOperation(int param1, int param2, String column) {
+		return String.format(
+				"SELECT %s FROM gears WHERE maxModule >= %d AND maxExternalDiameter >= %d ORDER BY maxExternalDiameter",
+				column, param1, param2);
+	}
+	
+	private String getQueryForCuttingOperation(int param1, String column) {
+		return String.format("SELECT %s FROM cutting where maxCutMaterial >= %d ORDER BY maxCutMaterial", column, param1);
+	}
 }
