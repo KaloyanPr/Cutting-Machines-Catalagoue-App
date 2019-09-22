@@ -9,12 +9,14 @@ import static sofia.tu.kptm.main.Operations.GEAR_PROCESSING;
 import static sofia.tu.kptm.main.Operations.SCRAPING;
 
 import java.awt.BorderLayout;
+import java.awt.Desktop;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -27,6 +29,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -67,6 +70,7 @@ public class CuttingMachineCatalogue implements ActionListener {
 	private JMenuBar menuBar;
 	private JMenu mnFile;
 	private JMenu mnAbout;
+	private JMenuItem catalogue;
 
 	private String operation = TURNING;
 
@@ -169,6 +173,10 @@ public class CuttingMachineCatalogue implements ActionListener {
 		mnFile = new JMenu("File");
 		menuBar.add(mnFile);
 
+		catalogue = new JMenuItem("Отвори справочник");
+		mnFile.add(catalogue);
+		catalogue.addActionListener(this);
+
 		mnAbout = new JMenu("About");
 		menuBar.add(mnAbout);
 
@@ -216,6 +224,9 @@ public class CuttingMachineCatalogue implements ActionListener {
 				handleSearchOperation();
 				paramInput1.setText("");
 				paramInput2.setText("");
+			}
+			if (source == catalogue) {
+				handleCatalogueOpening();
 			}
 		} catch (NumberFormatException nfe) {
 			JOptionPane.showMessageDialog(frame, "Моля въведете цяло число в текстовото поле!", ERROR_TITLE,
@@ -380,6 +391,19 @@ public class CuttingMachineCatalogue implements ActionListener {
 					JOptionPane.INFORMATION_MESSAGE);
 		}
 		return param1;
+	}
+
+	private void handleCatalogueOpening() throws IOException {
+		File file = new File("Метал.pdf");
+		if (!Desktop.isDesktopSupported()) {
+			JOptionPane.showMessageDialog(frame, "Не може да отворите файла на тази платформа", INFO_TITLE,
+					JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
+		Desktop desktop = Desktop.getDesktop();
+		if (file.exists()) {
+			desktop.open(file);
+		}
 	}
 
 	private void showParameters() {
