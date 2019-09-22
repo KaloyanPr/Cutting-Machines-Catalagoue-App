@@ -43,7 +43,8 @@ public class CuttingMachineCatalogue implements ActionListener {
 	private static final String DEFAULT_WIDTH = "Обработвана ширина (по избор) в мм";
 	private static final String NAME_OF_MACHINE = "Име на намерена машина: ";
 	private static final String ERROR_TITLE = "Грешка";
-	private static final String INFO_TITLE = "Инфо";
+	private static final String INFO_TITLE = "Информация";
+	private static final String PROJECT_REFERENCE = "https://github.com/KaloyanPr/Cutting-Machines-Catalogue-App";
 
 	private JFrame frame;
 	private JPanel panel;
@@ -71,6 +72,7 @@ public class CuttingMachineCatalogue implements ActionListener {
 	private JMenu mnFile;
 	private JMenu mnAbout;
 	private JMenuItem catalogue;
+	private JMenuItem about;
 
 	private String operation = TURNING;
 
@@ -180,53 +182,27 @@ public class CuttingMachineCatalogue implements ActionListener {
 		mnAbout = new JMenu("About");
 		menuBar.add(mnAbout);
 
+		about = new JMenuItem("За програмата");
+		mnAbout.add(about);
+		about.addActionListener(this);
+
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		try {
 			Object source = e.getSource();
-			if (operationsBox.getSelectedItem().equals(TURNING)) {
-				showParameters();
-				parameter1.setText(DEFAULT_DIAMETER);
-				parameter2.setText(DEFAULT_WIDTH);
-				operation = TURNING;
-			} else if (operationsBox.getSelectedItem().equals(DRILLING)) {
-				parameter1.setText("Диаметър на свредлото в мм ");
-				hideParameters();
-				operation = DRILLING;
-			} else if (operationsBox.getSelectedItem().equals(MILLING)) {
-				parameter1
-						.setText("Разстояние от оста на вретеното до работната повърнина на масата (максимално) в мм ");
-				hideParameters();
-				operation = MILLING;
-			} else if (operationsBox.getSelectedItem().equals(GRINDING)) {
-				showParameters();
-				parameter1.setText(DEFAULT_DIAMETER);
-				parameter2.setText(DEFAULT_WIDTH);
-				operation = GRINDING;
-			} else if (operationsBox.getSelectedItem().equals(SCRAPING)) {
-				showParameters();
-				parameter1.setText(DEFAULT_DIAMETER);
-				parameter2.setText(DEFAULT_WIDTH);
-				operation = SCRAPING;
-			} else if (operationsBox.getSelectedItem().equals(GEAR_PROCESSING)) {
-				showParameters();
-				parameter1.setText("Модул на зъбно колело в мм ");
-				parameter2.setText("Външен диаметър в мм ");
-				operation = GEAR_PROCESSING;
-			} else if (operationsBox.getSelectedItem().equals(CUTTING)) {
-				parameter1.setText("Отрязван материал (кръгъл) в мм");
-				hideParameters();
-				operation = CUTTING;
-			}
+			determineChosenProcess();
 			if (source == searchButton) {
 				handleSearchOperation();
 				paramInput1.setText("");
 				paramInput2.setText("");
-			}
-			if (source == catalogue) {
+			} else if (source == catalogue) {
 				handleCatalogueOpening();
+			} else if (source == about) {
+				JOptionPane.showMessageDialog(frame,
+						"Програмата е разработена за дипломна работа. Може да намерите проекта на " + PROJECT_REFERENCE,
+						INFO_TITLE, JOptionPane.INFORMATION_MESSAGE);
 			}
 		} catch (NumberFormatException nfe) {
 			JOptionPane.showMessageDialog(frame, "Моля въведете цяло число в текстовото поле!", ERROR_TITLE,
@@ -238,6 +214,42 @@ public class CuttingMachineCatalogue implements ActionListener {
 		} catch (Exception ex) {
 			JOptionPane.showMessageDialog(frame, "Възникна неочаквана грешка", ERROR_TITLE, JOptionPane.ERROR_MESSAGE);
 			ex.printStackTrace();
+		}
+	}
+
+	private void determineChosenProcess() {
+		if (operationsBox.getSelectedItem().equals(TURNING)) {
+			showParameters();
+			parameter1.setText(DEFAULT_DIAMETER);
+			parameter2.setText(DEFAULT_WIDTH);
+			operation = TURNING;
+		} else if (operationsBox.getSelectedItem().equals(DRILLING)) {
+			parameter1.setText("Диаметър на свредлото в мм ");
+			hideParameters();
+			operation = DRILLING;
+		} else if (operationsBox.getSelectedItem().equals(MILLING)) {
+			parameter1.setText("Разстояние от оста на вретеното до работната повърнина на масата (максимално) в мм ");
+			hideParameters();
+			operation = MILLING;
+		} else if (operationsBox.getSelectedItem().equals(GRINDING)) {
+			showParameters();
+			parameter1.setText(DEFAULT_DIAMETER);
+			parameter2.setText(DEFAULT_WIDTH);
+			operation = GRINDING;
+		} else if (operationsBox.getSelectedItem().equals(SCRAPING)) {
+			showParameters();
+			parameter1.setText(DEFAULT_DIAMETER);
+			parameter2.setText(DEFAULT_WIDTH);
+			operation = SCRAPING;
+		} else if (operationsBox.getSelectedItem().equals(GEAR_PROCESSING)) {
+			showParameters();
+			parameter1.setText("Модул на зъбно колело в мм ");
+			parameter2.setText("Външен диаметър в мм ");
+			operation = GEAR_PROCESSING;
+		} else if (operationsBox.getSelectedItem().equals(CUTTING)) {
+			parameter1.setText("Отрязван материал (кръгъл) в мм");
+			hideParameters();
+			operation = CUTTING;
 		}
 	}
 
@@ -336,11 +348,9 @@ public class CuttingMachineCatalogue implements ActionListener {
 					"SELECT %s FROM lathes WHERE maxProcessedDiameter >= %d ORDER BY maxProcessedDiameter ", column,
 					param1);
 		}
-
 		return String.format(
 				"SELECT %s FROM lathes WHERE maxProcessedDiameter >= %d AND maxProcessedWidth > %d ORDER BY maxProcessedDiameter ",
 				column, param1, param2);
-
 	}
 
 	private String getQueryForDrillingOperation(int param1, String column) {
