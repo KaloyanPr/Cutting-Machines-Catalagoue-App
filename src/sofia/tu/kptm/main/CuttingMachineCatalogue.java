@@ -212,8 +212,7 @@ public class CuttingMachineCatalogue implements ActionListener {
 		} catch (MachineNotFoundException mnfe) {
 			JOptionPane.showMessageDialog(frame, mnfe.getMessage(), INFO_TITLE, JOptionPane.INFORMATION_MESSAGE);
 		} catch (Exception ex) {
-			JOptionPane.showMessageDialog(frame, "Възникна неочаквана грешка", ERROR_TITLE, JOptionPane.ERROR_MESSAGE);
-			ex.printStackTrace();
+			JOptionPane.showMessageDialog(frame, "Възникна неочаквана грешка: "+ ex.getMessage(), ERROR_TITLE, JOptionPane.ERROR_MESSAGE);
 		}
 	}
 

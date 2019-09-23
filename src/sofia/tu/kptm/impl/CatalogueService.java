@@ -66,7 +66,7 @@ public class CatalogueService {
 			Blob b = rs.getBlob(1);
 			barr = b.getBytes(1, (int) b.length());
 		}
-		File tmpFile = new File("tmpImage");
+		File tmpFile = new File("C:\\Temp\\"+"tmpFile");
 		try (OutputStream targetFile = new FileOutputStream(tmpFile)) {
 			targetFile.write(barr);
 			BufferedImage bimg = ImageIO.read(tmpFile);
